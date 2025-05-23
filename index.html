@@ -1,0 +1,222 @@
+<!DOCTYPE html><!--*-js-indent-level:2;css-indent-offset:2-*-->
+<!-- Copyright (c) 2025 by zrajm. License: GPLv2 -->
+<meta charset=utf-8>
+<meta name=viewport content=width=device-width,initial-scale=1>
+<link rel=icon href=../www/favicon.svg>
+<link rel=stylesheet href=www/main.css>
+<input id=invertmode type=checkbox>
+
+<p><a href=../>« Back to Main page</a>
+<main></main>
+
+<script type=module>
+  import('../baremark/addon/table.js')
+    .then(() => import('../baremark/addon/toc.js'))
+    .then(() => import('../baremark/addon/meta.js'))
+    .then(() => {
+      fetch('README.md')
+        .then(x => x.text())
+        .then(markdown => {
+          const html = baremark(markdown)
+          const { title, titleId } = baremark.meta
+          document.title = baremark.meta.title
+          document.querySelector('main').innerHTML =
+            `<div class=docs>\n`
+            + `<h1 id="${titleId}">${title}</h1>\n\n`
+            + `${html}\n`
+            + `</div>`
+          // If page finished redrawing, and is at top of page (= user hasn't
+          // scrolled down), jump #hash fragment in URL (if there is one).
+          setTimeout(() => {
+            if (location.hash && scrollY === 0) {
+              location.href = location.hash
+            }
+          }, 0)
+        })
+    })
+</script>
+
+<hr>
+
+<h1 id=tests>Test Cases</h1>
+
+<p>The test cases below are intended as specs for Quotecurl, though they will
+evolve as Quotecurl does so.
+
+<p><b>Legend:</b>
+  <span class="legend pass">Passed</span>
+  <span class="legend fail">Failed</span>
+  <span class="legend skip"><s>All skipped</s></span></p>
+
+<div data-testsuite="tests.json" data-function="quotecurl"></div>
+
+<footer>© 2025 by zrajm, Uppsala.</footer>
+
+<script src=www/jquery-3.6.0.slim.min.js></script>
+<script type=module>
+  // Org-mode style opening of <details>. Clicking a <summary> cycles through:
+  // + children = opens this <details> (but none of its children)
+  // + subtree  = opens up all child <details> recursively
+  // + folded   = closes this & all child <details>
+  $(document).on('click', 'details > summary', e => {
+    e.preventDefault()
+    const $tag = $(e.currentTarget.parentElement) // get parent <details> tag
+    if ($tag.attr('open')) {
+      const $subtags = $tag.find('> details')
+      const $opened  = $subtags.filter((_,t)=>t.hasAttribute('open'))
+      if ($subtags.length && $opened.length === 0) {
+        $subtags.attr('open', 1)               // open subtags
+      } else {
+        $opened.add($tag).attr('open', null)   // close this & subtags
+      }
+    } else {
+      $tag.attr('open', 1)                     // open
+    }
+  })
+</script>
+<script type=module>
+  import { quotecurl } from './quotecurl.mjs'
+  self.quotecurl = quotecurl
+  $(()=>{
+    // jQuery plugins.
+    jQuery.fn.forEach = [].forEach
+    jQuery.fn.reduce = [].reduce
+
+    function escapeHtml(x) {
+      return x.replace(
+        /["&<>]/g,
+        x => `&${{ '"': 'quot', '&': 'amp', '<': 'lt', '>': 'gt' }[x]};`)
+    }
+    function inputComment(x) {
+      if (typeof x === "string") { x = [x] }
+      return x.map(
+        x => '<div class="comment">'
+          + (escapeAscii(escapeHtml(x))
+             .replace(/\S+/g, '<span>$&</span>')
+             .replace(/\S.*/g, '<span>$&</span>')
+            )
+          + '</div>'
+      ).join('')
+    }
+    // Escape any ASCII control characters with C escape sequences.
+    function escapeAscii(x) {
+      return x.replace(
+        /[\x00-\x1f\x7f-\x9f\\]/g,
+        m => ({
+          '\a': '\\a', '\b': '\\b', '\f': '\\f',  '\n'  : '\\n', '\r': '\\r',
+          '\t': '\\t', '\v': '\\v', '\\': '\\\\', '\x1B': '\\e', ' ' : '␣',
+        }[m] ||
+          '\\x' + m.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')))
+    }
+    function warn(html) {
+      if (/<style\b/.test(html)) {
+        return '!!! Contains <tt>&lt;style&gt;</tt> tag, won’t display here!'
+      } else if (/<script\b/.test(html)) {
+        return '!!! Contains <tt>&lt;script&gt;</tt> tag, won’t display here!'
+      } else if (/<img\b/.test(html)) {
+        return '!!! Contains <tt>&lt;img&gt;</tt> tag, won’t display here!'
+      }
+      return ''
+    }
+    function processTests(tests, $e, cb) {
+      if (!tests.length) {
+        $e.html('[NONE YET]')
+        return
+      }
+      let sectionName = null, $section
+      tests.forEach((test) => {
+        // If test is just a string (not object) turn it into section heading.
+        if (typeof test === 'string') {
+          test = { section: test }
+        }
+        // If section name as changed, append new section.
+        if ((test.section === undefined && sectionName === null) ||
+            (test.section !== undefined && test.section !== sectionName)) {
+          sectionName = test.section
+          $section = $(`<details class=group>
+              <summary>${sectionName ?? 'NO SECTION NAME'}</summary>
+             </details>`).appendTo($e)
+        }
+        if (test.data === undefined) { return }
+        // Count as pass, fail or skip.
+        const want = test.bare || test.want
+        const got = (() => {
+          try {
+            return cb(test.data)
+          } catch (e) {
+            return `CAUGHT ERROR: ${e}`
+          }
+        })()
+
+        // Add test result to current section.
+        $section.append(
+          `<details class="test ${test.skip ? 'skip' : ''} ${got === want ? 'pass' : 'fail'}">
+            <summary>
+              ${test.example ? `Test ${test.example}` : ''}${test.example && test.name ? ': ' : ''}
+              ${test.name ? escapeAscii(test.name) : (test.example ? '' : escapeHtml(escapeAscii(test.data)) + '<br>→ ' + escapeHtml(escapeAscii(test.want)))}
+              ${test.hasOwnProperty('FIXME') ? ` <span class=fixme>(FIXME${test.FIXME ? ': ' + escapeAscii(test.FIXME) : ''})</span>` : ''}
+              ${test.hasOwnProperty('NOTE')  ? ` <span class=note >(NOTE${ test.NOTE  ? ': ' + escapeAscii(test.NOTE)  : ''})</span>` : ''}
+              ${typeof(test.skip)==='string' ? ` <span class=skipnote>(SKIPPED${ test.skip  ? ': ' + escapeAscii(test.skip)  : ''})</span>` : ''}
+              ${test.comment                 ? '<div style="float:right;opacity:.5">#</div>'                                          : ''}
+            </summary>
+            <table>
+              <thead><tr><th><th>Code<th>Appearance</thead>
+              <tr><th>Data
+                <td>
+                  <pre>${test.comment ? inputComment(test.comment) : ''}${escapeAscii(escapeHtml(test.data))}</pre>
+                <td><pre>${warn(test.data) || escapeHtml(test.data)}</pre>
+              <tr><th>Want
+                <td><pre>${escapeAscii(escapeHtml(want))}</pre>
+                <td>${warn(want) || want}
+              <tr><th>Got
+                <td><pre>${escapeAscii(escapeHtml(got))}</pre>
+                <td>${warn(got) || got}
+            </table>
+          </details>`)
+      })
+
+      // Go through sections, set color and append counters.
+      $e.find('> details.group').forEach(e => {
+        const $e = $(e)
+        const counter = $e.find('> details.test').reduce((a, e) => {
+          const $e = $(e)
+          a[$e.hasClass('skip') ? 'skip' : $e.hasClass('pass') ? 'pass' : 'fail'] += 1
+          return a
+        }, { pass: 0, fail: 0, skip: 0 })
+        $e.addClass(`
+          ${counter.fail ? 'fail' : ''}
+          ${counter.pass ? 'pass' : ''}
+          ${counter.skip ? 'skip' : ''}`)
+          .find('> summary').append(
+            `<div class=count>
+              <span class=fail>${counter.fail}</span>
+              <span class=pass>${counter.pass}</span>
+              <span class=skip>${counter.skip}</span>
+            </div>`)
+      })
+    }
+    // Load test cases from jsonUrl and show in $e (jQuery DOM element).
+    function testSuite(jsonUrl, $e, cb) {
+      window.fetch(jsonUrl)
+        .then(response => response.text())
+        .then(json => {
+          let data
+          try {
+            data = JSON.parse(json)
+          } catch (e) {
+            $e.append(`<div class=error><b>Failed to parse JSON file ‘${jsonUrl}’</b><br>${e}`)
+          }
+          try {
+            return processTests(data, $e, cb)
+          } catch (e) {
+            $e.append(`<div class=error><b>Failed to run tests in ‘${jsonUrl}’</b><br>${e}`)
+          }
+        })
+    }
+    $('[data-testsuite]').forEach(t => {
+      const { function: funcName, testsuite } = t.dataset
+      testSuite(testsuite, $(t), self[funcName])
+    })
+  })
+</script>
+<!--[eof]-->

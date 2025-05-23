@@ -1,0 +1,138 @@
+[
+  "Single quotes", {
+    "name": "Empty quotes",
+    "data": "''",
+    "want": "‘’"
+  }, {
+    "name": "Single quote with only punctuation inside",
+    "data": "'()'",
+    "want": "‘()’"
+  }, {
+    "name": "Single word inside",
+    "data": "'word'",
+    "want": "‘word’"
+  }, {
+    "name": "Single word inside, contain apostrophe",
+    "data": "'isn't'",
+    "want": "‘isn’t’"
+  }, {
+    "name": "Single word inside, starts with apostrophe",
+    "data": "''cause'",
+    "want": "‘’cause’"
+  }, {
+    "name": "Single word inside, ends with apostrophe",
+    "data": "'havin''",
+    "want": "‘havin’’"
+  }, {
+    "name": "Sentence containing two apostrophes",
+    "data": "Let's look at two apostrophe's [sic].",
+    "want": "Let’s look at two apostrophe’s [sic]."
+  }, {
+    "name": "Sentence containing three apostrophes",
+    "data": "Let's look at three apostrophes: won't, shouldn't.",
+    "want": "Let’s look at three apostrophes: won’t, shouldn’t."
+  }, {
+    "data": "What about slashes/'virgules'?",
+    "want": "What about slashes/‘virgules’?"
+  }, {
+    "data": "And {'curly' braces}?",
+    "want": "And {‘curly’ braces}?"
+  }, {
+    "data": "xosuh. ('Souhou.') souho",
+    "want": "xosuh. (‘Souhou.’) souho"
+  }, {
+    "data": "…'. 'Whatevs!'",
+    "want": "…’. ‘Whatevs!’"
+  }, {
+    "data": "'Hi, John!', 'Going back to the '90-ties?'",
+    "want": "‘Hi, John!’, ‘Going back to the ’90-ties?’"
+  }, {
+    "data": "xosuh. 'Souhou.' souho",
+    "want": "xosuh. ‘Souhou.’ souho"
+  }, {
+    "data": "xosuh 'who isn't?'. souho",
+    "want": "xosuh ‘who isn’t?’. souho"
+  }, {
+    "data": "''Tis not normal! 'Tis an abomination!', He said.",
+    "want": "‘’Tis not normal! ’Tis an abomination!’, He said."
+  }, {
+    "data": "xosuh '(souhou).' souho",
+    "want": "xosuh ‘(souhou).’ souho"
+  }, {
+    "name": "Space inside",
+    "skip": "Doesn't work",
+    "data": "'( )'",
+    "want": "‘( )’"
+  }, {
+    "skip": "Unfixable?",
+    "data": "'80-ties? Uhuh, 'Why not?'",
+    "want": "’80-ties? Uhuh, ’Why not?’"
+  },
+  "Nested single quotes", {
+    "data": "''x''",
+    "want": "‘‘x’’"
+  }, {
+    "skip": "Not yet implemented",
+    "data": "'x 'x 'x 'x'''",
+    "want": "‘x ‘x ‘x ‘x’’’"
+  }, {
+    "data": "'''x' x' x' x'",
+    "want": "‘‘‘x’ x’ x’ x’"
+  }, {
+    "skip": "Not yet implemented",
+    "data": "''' x' x' x' x'",
+    "want": "‘‘‘ x’ x’ x’ x’"
+  }, {
+    "skip": "Not yet implemented",
+    "data": "'''' x ' x' x' x'",
+    "want": "’‘‘ x ‘ x’ x’ x’"
+    
+  },
+  "Double quotes", {
+    "data": "\"\"",
+    "want": "“”"
+  }, {
+    "data": "\"\"Hey!\"\"",
+    "want": "““Hey!””"
+  }, {
+    "data": "A double quote--\"within\" dashes--would be nice.",
+    "want": "A double quote–“within” dashes–would be nice."
+  }, {
+    "data": "A double quote--\"within dashes\"--would be nice.",
+    "want": "A double quote–“within dashes”–would be nice."
+  }, {
+    "data": "I haven't tried (\"parentheses\" yet).",
+    "want": "I haven’t tried (“parentheses” yet)."
+  }, {
+    "data": "I haven't tried (\"parentheses\") yet.",
+    "want": "I haven’t tried (“parentheses”) yet."
+  }, {
+    "data": "What about \"(parentheses)\"?.",
+    "want": "What about “(parentheses)”?."
+  }, {
+    "data": "And \"[brackets]\"?.",
+    "want": "And “[brackets]”?."
+  }, {
+    "data": "I haven't tried [\"brackets\" yet].",
+    "want": "I haven’t tried [“brackets” yet]."
+  }, {
+    "data": "I haven't tried [\"brackets\"] yet.",
+    "want": "I haven’t tried [“brackets”] yet."
+  }, {
+    "data": "What about slashes/\"virgules\"?",
+    "want": "What about slashes/“virgules”?"
+  }, {
+    "data": "And {\"curly\" braces}?",
+    "want": "And {“curly” braces}?"
+  }, {
+    "data": "\"'Twas the night before Christmas…\" with an apostrophe.",
+    "want": "“’Twas the night before Christmas…” with an apostrophe."
+  },
+  "Mixed", {
+    "data": "\"'Let's try \"nested\" quotes,' he said.\"",
+    "want": "“‘Let’s try “nested” quotes,’ he said.”"
+  }, {
+    "data": "'\"'x'\"'",
+    "want": "‘“‘x’”’"
+  }
+]

@@ -1,0 +1,119 @@
+#+STARTUP: hidestars -*- org -*-
+
+* TODO Cleanup this TODO
+* TODO Smarter "…" matching?
+  " turns into either <start-quote>, <end-quote> (default) or <double-prime>.
+
+  " directly between alphanumerics
+    * <(°|')[SPACE]NUM>"<ALNUM|[PUNCT]SPACE> = <double-prime>
+      (ALNUM because coordinates, e.g. 51°28′48″N)
+
+    * preceded by <'[SPACE]NUM> or <°[SPACE]NUM>, followed by <NUM> or
+      <[PUNCT]SPACE> = <double-prime>
+    * preceded by <NUM> = <start-quote>|<end-quote>|<double-prime>
+
+  " directly adjacent to one alphanumeric ≈ maybe apostrophe (prime, if after number)
+  " not adjacent to alphanumeric = quote
+    * space/start-of-string found before (optional punctuation between) = start
+      quote
+    * space/end-of-string found after (optional punctuation between) = end
+      quote
+    * space found before AND after (optional punctuation between) = either
+      quote (or end quote if not matching another quote)
+
+* TODO Smarter '…' matching?
+  ' turns into either <start-quote>, <end-quote> (default), <apostrophe> or <prime>.
+
+  ' directly between alphanumerics = certain apostrophe
+  ' directly adjacent to one alphanumeric ≈ maybe apostrophe (prime, if after number)
+  ' not adjacent to alphanumeric = quote
+    * space/start-of-string found before (optional punctuation between) = start
+      quote
+    * space/end-of-string found after (optional punctuation between) = end
+      quote
+    * space found before AND after (optional punctuation between) = either
+      quote (or end quote if not matching another quote)
+
+
+‹…› = uncertain quotes (need to be matched)
+«…» = certain quote
+
+‹‹›
+
+‹››
+
+ | 'I like 6', he said, 'and 7 is also good'. |
+ | ‹        ›           ‹                  ›  |
+ | ?        ?           ?                  ?  |
+
+ | 'I like 6,' he said, 'and 7 is also good'. |
+ | ‹         »           ‹                  › |
+ | ?         !           ?                  ? |
+
+ | ''Cause I said so!' |
+ | «‹                » |
+ | !?                ! |
+
+ | 'Hate 'em!'  |
+ | ‹     ‹   » |
+ | ?     ?   ! |
+
+ | '¡Cuidado, 'Zhaan!' |
+ | «          ‹      » |
+ | !          ?      ! |
+
+ | '¡Hate 'em!' |
+ | «      ‹   » |
+ | !      ?   ! |
+
+ | 'Twas 'okay'. |
+ | ‹     ‹    ›  |
+ | ?     ?    ?  |
+
+ | 'I came 'cause I wanted!' |
+ | ‹       ‹               » |
+
+ | 'Cause he said 'I want to!' |
+ | ‹              ‹          » |
+
+* TODO Handle feet/inches, minutes/seconds?
+  Can this be done in an unambiguous way?
+
+  I mean, there are some pretty clear-cut cases,
+
+  ! NUM°NUM'NUM" -> NUM°NUM′NUM″   (NUM°NUM′NUM<endquote> is pretty unlikely)
+  ! NUM''        -> NUM<prime><endquote>
+  ? NUM'         -> NUM′           (NUM<endquote> is way more likely)
+
+  |     | 'I like 6', he said, 'and 7 is also good'. |
+  |     | «        »           «                  »  |
+  | NOT | «        /           ’                  »  |
+
+  |     | ''Cause I said so!' |
+  |     | «                 » |
+  | NOT |  «                » |
+
+  These are indistinguishable!
+
+  |   | 'x 'x' |              |
+  |   | (  · ) | 'Hate 'em!'  |
+  |   | ·  ( ) | 'Twas 'okay' |
+
+  |     | 'I came 'cause I wanted!' |
+  |     | «                       » |
+  | NOT | «       »                 |
+  |     | 'Cause he said 'I want to!' |
+  |     |                «          » |
+  | NOT | «                         » |
+
+
+
+  |      | 'If he's 9' tall, he's pretty tall.' |
+  |      | «         /                        »  |
+  | NOT  | «         »                          |
+
+
+
+  "NUM'NUM"" -> “NUM′NUM″”
+  'NUM'NUM"' -> ‘NUM′NUM″’
+* [eof]
