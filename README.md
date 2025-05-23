@@ -63,4 +63,14 @@ License
 =======
 GNU General Public License, Version 2.
 
+
+Test Cases
+==========
+The test cases show here are intended as specs for Quotecurl, though they will
+evolve as Quotecurl does so.
+
+[Go to Test Case Page][Test Cases] (If you don’t already see the tests below.)
+
+[Test Cases]: https://zrajm.org/quotecurl/#test-cases
+
 <!--[eof]-->
