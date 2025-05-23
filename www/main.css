@@ -71,7 +71,7 @@ input[type="checkbox"] {
     }
   }
 }
-a { border-radius: 1px; color: #00d }
+a { border-radius: 1px; color: #36d }
 a:hover { background: #22f5; outline: 2px solid #22f5 }
 :focus { outline-offset: 1px; outline: 2px solid #6668 }
 a:active {}

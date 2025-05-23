@@ -7,7 +7,7 @@ each of them into the appropriate *fancy* Unicode character.
 
 <toc heading=Contents class=toc>
 
-Do this:
+To use, first download [`quotecurl.mjs`][source], then do this:
 
 ```
 import { quotecurl } from './quotecurl.mjs'
@@ -72,5 +72,6 @@ evolve as Quotecurl does so.
 [Go to Test Case Page][Test Cases] (If you don’t already see the tests below.)
 
 [Test Cases]: https://zrajm.org/quotecurl/#test-cases
+[source]: https://zrajm.org/quotecurl/quotecurl.mjs
 
 <!--[eof]-->
